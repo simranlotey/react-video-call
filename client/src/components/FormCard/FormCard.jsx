@@ -73,15 +73,7 @@ const FormCard = () => {
                 className={css(styles.mainBtn)}
                 onClick={() => callUser(idToCall)}
               >
-                {!callAccepted ? (
-                  <>
-                    <MdCall size={22} /> Call
-                  </>
-                ) : (
-                  <>
-                    <MdCall size={22} /> Calling...
-                  </>
-                )}
+                <MdCall size={22} /> Call
               </Button>
             </Form>
           </Card>
