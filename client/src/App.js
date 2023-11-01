@@ -5,7 +5,6 @@ import NavBar from "./components/Navbar/Navbar";
 import IncomingCall from "./components/IncomingCall/IncomingCall";
 
 const App = () => {
-  // document.title = "Hhey";
   return (
     <>
       <NavBar />
