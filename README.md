@@ -70,7 +70,7 @@ npm start
 2. Use the controls to mute/unmute your microphone and enable/disable your camera during the call.
 3. Enjoy real-time video communication with your friends and colleagues!
 
-## Hosting
+## Deployment
 
 - **Frontend Hosting**: The frontend of this application is hosted on [Netlify](https://www.netlify.com/). You can access it at [Frontend url](https://yourvideoshare.netlify.app/).
 
