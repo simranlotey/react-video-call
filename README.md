@@ -56,13 +56,13 @@ cd client
 npm install
 ```
 
-5. Start the development server:
+6. Start the development server:
 
 ```
 npm start
 ```
 
-5. Open your web browser and visit [http://localhost:3000](http://localhost:3000) to access the application.
+7. Open your web browser and visit [http://localhost:3000](http://localhost:3000) to access the application.
 
 ## Usage
 
@@ -72,9 +72,9 @@ npm start
 
 ## Hosting
 
-- **Frontend Hosting**: The frontend of this application is hosted on [Netlify](https://www.netlify.com/). You can access it at [Frontend netlify url](https://yourvideoshare.netlify.app/).
+- **Frontend Hosting**: The frontend of this application is hosted on [Netlify](https://www.netlify.com/). You can access it at [Frontend url](https://yourvideoshare.netlify.app/).
 
-- **Backend Hosting**: The backend of this application is hosted on [Render.com](https://render.com/). You can access it at [Backend render url](https://video-call-server-gm7i.onrender.com).
+- **Backend Hosting**: The backend of this application is hosted on [Render.com](https://render.com/). You can access it at [Backend url](https://video-call-server-gm7i.onrender.com).
 
 ## Contributing
 
