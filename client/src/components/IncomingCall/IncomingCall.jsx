@@ -7,8 +7,7 @@ import { MdCallEnd } from "react-icons/md";
 import { css } from "aphrodite";
 
 const IncomingCall = () => {
-  const { answerCall, call, callAccepted, incomingLeaveCall, setOtherUser } =
-    useContext(ContextProvider);
+  const { answerCall, call, callAccepted, incomingLeaveCall, setOtherUser } = useContext(ContextProvider);
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = () => {

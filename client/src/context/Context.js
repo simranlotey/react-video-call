@@ -6,7 +6,7 @@ const URL = "http://localhost:5000";
 // const URL = "https://video-call-server-gm7i.onrender.com";
 
 const ContextProvider = createContext();
-export const socket = io(URL);
+const socket = io(URL);
 
 const SocketContext = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState(false);

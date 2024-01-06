@@ -17,8 +17,7 @@ const FormCard = () => {
     }, 1500);
   };
 
-  const { name, setName, me, callUser, callAccepted } =
-    useContext(ContextProvider);
+  const { name, setName, me, callUser, callAccepted } = useContext(ContextProvider);
 
   return (
     <>
@@ -36,7 +35,6 @@ const FormCard = () => {
                   className={css(styles.formControl)}
                   onChange={(e) => {
                     setName(e.target.value);
-                    sessionStorage.setItem("name", e.target.value);
                   }}
                   placeholder="Enter your name"
                 />
