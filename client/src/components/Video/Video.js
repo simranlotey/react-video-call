@@ -1,6 +1,12 @@
 import React, { useContext } from "react";
 import { ContextProvider } from "../../context/Context";
-import { MdMic, MdMicOff, MdVideocam, MdVideocamOff, MdCallEnd } from "react-icons/md";
+import {
+  MdMic,
+  MdMicOff,
+  MdVideocam,
+  MdVideocamOff,
+  MdCallEnd,
+} from "react-icons/md";
 import { Button } from "react-bootstrap";
 import { Avatar } from "antd";
 import { FaUserLarge, FaVolumeXmark } from "react-icons/fa6";
@@ -10,7 +16,23 @@ import { styles } from "./index";
 import Loading from "../Loading/Loading";
 
 const Video = () => {
-  const { call, callAccepted, myVideo, userVideo, stream, name, callEnded, leaveCall, userName, myVideoStatus, userVideoStatus, updateVideo, myMicStatus, userMicStatus, updateMic } = useContext(ContextProvider);
+  const {
+    call,
+    callAccepted,
+    myVideo,
+    userVideo,
+    stream,
+    name,
+    callEnded,
+    leaveCall,
+    userName,
+    myVideoStatus,
+    userVideoStatus,
+    updateVideo,
+    myMicStatus,
+    userMicStatus,
+    updateMic,
+  } = useContext(ContextProvider);
 
   return (
     <>
@@ -149,7 +171,10 @@ const Video = () => {
           <Button onClick={updateMic} className={`${css(styles.myBtn)} shadow`}>
             {myMicStatus ? <MdMic size={25} /> : <MdMicOff size={25} />}
           </Button>
-          <Button onClick={updateVideo} className={`${css(styles.myBtn)} shadow`}>
+          <Button
+            onClick={updateVideo}
+            className={`${css(styles.myBtn)} shadow`}
+          >
             {myVideoStatus ? (
               <MdVideocam size={25} />
             ) : (

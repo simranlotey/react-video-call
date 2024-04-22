@@ -2,12 +2,13 @@ import React, { useContext, useState, useEffect } from "react";
 import answercall from "../../assests/answer-call.gif";
 import { ContextProvider } from "../../context/Context";
 import { Button, Modal } from "react-bootstrap";
-import { styles, AnswerCallImage }  from "./index";
+import { styles, AnswerCallImage } from "./index";
 import { MdCallEnd } from "react-icons/md";
 import { css } from "aphrodite";
 
 const IncomingCall = () => {
-  const { answerCall, call, callAccepted, incomingLeaveCall, setOtherUser } = useContext(ContextProvider);
+  const { answerCall, call, callAccepted, incomingLeaveCall, setOtherUser } =
+    useContext(ContextProvider);
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = () => {
@@ -54,5 +55,5 @@ const IncomingCall = () => {
     </>
   );
 };
-// 9B1FE8
+
 export default IncomingCall;

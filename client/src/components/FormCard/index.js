@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    paddingBottom: "35px",
+    paddingBottom: "15px",
   },
   card: {
     borderRadius: "10px !important",
