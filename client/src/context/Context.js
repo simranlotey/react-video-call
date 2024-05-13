@@ -1,182 +1,308 @@
 import React, { useState, useEffect, useRef, createContext } from "react";
-import { io } from "socket.io-client";
+import { socket } from "../config/config";
 import Peer from "simple-peer";
 
-const URL = "http://localhost:5000";
-// const URL = "https://video-call-server-gm7i.onrender.com";
+const VideoCallContext = createContext();
 
-const ContextProvider = createContext();
-const socket = io(URL);
-
-const SocketContext = ({ children }) => {
-  const [callAccepted, setCallAccepted] = useState(false);
-  const [callEnded, setCallEnded] = useState(false);
-  const [stream, setStream] = useState();
-  const [name, setName] = useState("");
+const VideoCallProvider = ({ children }) => {
+  const [userStream, setUserStream] = useState(null);
   const [call, setCall] = useState({});
-  const [me, setMe] = useState("");
-  const [userName, setUserName] = useState("");
-  const [otherUser, setOtherUser] = useState("");
-  const [myVideoStatus, setMyVideoStatus] = useState(true);
-  const [userVideoStatus, setUserVideoStatus] = useState();
-  const [myMicStatus, setMyMicStatus] = useState(true);
-  const [userMicStatus, setUserMicStatus] = useState();
+  const [isCallAccepted, setIsCallAccepted] = useState(false);
+  const [isCallEnded, setIsCallEnded] = useState(false);
+  const [myUserId, setMyUserId] = useState("");
+  const [partnerUserId, setPartnerUserId] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [receivedMessage, setReceivedMessage] = useState("");
+  const [name, setName] = useState("");
+  const [opponentName, setOpponentName] = useState("");
+  const [isMyVideoActive, setIsMyVideoActive] = useState(true);
+  const [isPartnerVideoActive, setIsPartnerVideoActive] = useState();
+  const [isMyMicActive, setIsMyMicActive] = useState(true);
+  const [isPartnerMicActive, setIsPartnerMicActive] = useState();
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
 
-  const myVideo = useRef();
-  const userVideo = useRef();
-  const connectionRef = useRef();
+  const myVideoRef = useRef();
+  const partnerVideoRef = useRef();
+  const peerConnectionRef = useRef();
+  const screenShareTrackRef = useRef();
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        myVideo.current.srcObject = currentStream;
-      });
-    socket.on("me", (id) => setMe(id));
-
-    socket.on("updateUserMedia", ({ type, currentMediaStatus }) => {
-      if (currentMediaStatus !== null) {
-        switch (type) {
-          case "video":
-            setUserVideoStatus(currentMediaStatus);
-            break;
-          case "mic":
-            setUserMicStatus(currentMediaStatus);
-            break;
-          default:
-            setUserMicStatus(currentMediaStatus[0]);
-            setUserVideoStatus(currentMediaStatus[1]);
-            break;
+    const getUserMediaStream = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        setUserStream(stream);
+        if (myVideoRef.current) {
+          myVideoRef.current.srcObject = stream;
         }
+      } catch (error) {
+        console.error("Error accessing media devices:", error);
       }
-    });
+    };
 
-    socket.on("endCall", () => {
-      window.location.reload();
-    });
-    socket.on("callUser", ({ from, name: callerName, signal }) => {
-      setCall({ isReceivingCall: true, from, name: callerName, signal });
-    });
+    const handleSocketEvents = () => {
+      socket.on("socketId", (id) => {
+        setMyUserId(id);
+      });
+
+      socket.on("mediaStatusChanged", ({ mediaType, isActive }) => {
+        if (isActive !== null) {
+          if (mediaType === "video") {
+            setIsPartnerVideoActive(isActive);
+          } else if (mediaType === "audio") {
+            setIsPartnerMicActive(isActive);
+          } else {
+            setIsPartnerMicActive(isActive[0]);
+            setIsPartnerVideoActive(isActive[1]);
+          }
+        }
+      });
+
+      socket.on("callTerminated", () => {
+        setIsCallEnded(true);
+        window.location.reload();
+      });
+
+      socket.on("incomingCall", ({ from, name, signal }) => {
+        setCall({ isReceivingCall: true, from, name, signal });
+      });
+
+      socket.on("receiveMessage", ({ message: text, senderName }) => {
+        const receivedMsg = { text, senderName };
+        setReceivedMessage(receivedMsg);
+
+        const timeout = setTimeout(() => {
+          setReceivedMessage({});
+        }, 2000);
+
+        return () => clearTimeout(timeout);
+      });
+    };
+
+    getUserMediaStream();
+    handleSocketEvents();
   }, []);
 
-  const answerCall = () => {
-    setCallAccepted(true);
-    setOtherUser(call.from);
-    const peer = new Peer({ initiator: false, trickle: false, stream });
+  const receiveCall = () => {
+    setIsCallAccepted(true);
+    setPartnerUserId(call.from);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: userStream,
+    });
 
     peer.on("signal", (data) => {
       socket.emit("answerCall", {
         signal: data,
         to: call.from,
         userName: name,
-        type: "both",
-        myMediaStatus: [myMicStatus, myVideoStatus],
+        mediaType: "both",
+        mediaStatus: [isMyMicActive, isMyVideoActive],
       });
     });
 
     peer.on("stream", (currentStream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = currentStream;
+      if (partnerVideoRef.current) {
+        partnerVideoRef.current.srcObject = currentStream;
       }
     });
     peer.signal(call.signal);
-    connectionRef.current = peer;
+    peerConnectionRef.current = peer;
   };
 
-  const callUser = (id) => {
-    const peer = new Peer({ initiator: true, trickle: false, stream });
-    setOtherUser(id);
-    peer.on("signal", (data) => {
-      socket.emit("callUser", {
-        userToCall: id,
+  const callUser = (targetId) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: userStream,
+    });
+    setPartnerUserId(targetId);
+
+    const handleSignal = (data) => {
+      socket.emit("initiateCall", {
+        targetId,
         signalData: data,
-        from: me,
-        name,
+        senderId: myUserId,
+        senderName: name,
       });
-    });
+    };
 
-    peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-    });
+    const handleStream = (currentStream) => {
+      partnerVideoRef.current.srcObject = currentStream;
+    };
 
-    socket.on("callAccepted", ({ signal, userName }) => {
-      setCallAccepted(true);
-      setUserName(userName);
+    const joinAcceptedCall = ({ signal, userName }) => {
+      setIsCallAccepted(true);
+      setOpponentName(userName);
       peer.signal(signal);
-      socket.emit("updateMyMedia", {
-        type: "both",
-        currentMediaStatus: [myMicStatus, myVideoStatus],
+      socket.emit("changeMediaStatus", {
+        mediaType: "both",
+        isActive: [isMyMicActive, isMyVideoActive],
       });
-    });
+    };
 
-    connectionRef.current = peer;
+    peer.on("signal", handleSignal);
+    peer.on("stream", handleStream);
+    socket.on("callAnswered", joinAcceptedCall);
+
+    peerConnectionRef.current = peer;
   };
 
-  const updateVideo = () => {
-    setMyVideoStatus((currentStatus) => {
-      socket.emit("updateMyMedia", {
-        type: "video",
-        currentMediaStatus: !currentStatus,
-      });
-      stream.getVideoTracks()[0].enabled = !currentStatus;
-      return !currentStatus;
+  const toggleVideo = () => {
+    const newStatus = !isMyVideoActive;
+    setIsMyVideoActive(newStatus);
+
+    userStream.getVideoTracks().forEach((track) => {
+      track.enabled = newStatus;
     });
+
+    socket.emit("changeMediaStatus", {
+      mediaType: "video",
+      isActive: newStatus,
+    });
+
+    return newStatus;
   };
 
-  const updateMic = () => {
-    setMyMicStatus((currentStatus) => {
-      socket.emit("updateMyMedia", {
-        type: "mic",
-        currentMediaStatus: !currentStatus,
-      });
-      stream.getAudioTracks()[0].enabled = !currentStatus;
-      return !currentStatus;
+  const toggleMicrophone = () => {
+    const newStatus = !isMyMicActive;
+    setIsMyMicActive(newStatus);
+
+    userStream.getAudioTracks().forEach((track) => {
+      track.enabled = newStatus;
     });
+
+    socket.emit("changeMediaStatus", {
+      mediaType: "audio",
+      isActive: newStatus,
+    });
+
+    return newStatus;
   };
 
-  const leaveCall = () => {
-    setCallEnded(true);
-    socket.emit("endCall", { id: otherUser });
-    connectionRef.current.destroy();
+  const toggleScreenSharingMode = () => {
+    if (!isMyVideoActive) {
+      alert("Please turn on your video to share the screen");
+      return;
+    }
+    if (!isScreenSharing) {
+      navigator.mediaDevices
+        .getDisplayMedia({ cursor: true })
+        .then((screenStream) => {
+          const screenTrack = screenStream.getTracks()[0];
+          const videoTracks = peerConnectionRef.current.streams[0].getTracks();
+          const videoTrack = videoTracks.find(
+            (track) => track.kind === "video"
+          );
+          peerConnectionRef.current.replaceTrack(
+            videoTrack,
+            screenTrack,
+            userStream
+          );
+          screenTrack.onended = () => {
+            peerConnectionRef.current.replaceTrack(
+              screenTrack,
+              videoTrack,
+              userStream
+            );
+            myVideoRef.current.srcObject = userStream;
+            setIsScreenSharing(false);
+          };
+          myVideoRef.current.srcObject = screenStream;
+          screenShareTrackRef.current = screenTrack;
+          setIsScreenSharing(true);
+        })
+        .catch((error) => {
+          console.log("Failed to get screen sharing stream");
+        });
+    } else {
+      screenShareTrackRef.current.stop();
+      screenShareTrackRef.current.onended();
+    }
+  };
+
+  const toggleFullScreen = (e) => {
+    const element = e.target;
+
+    if (!document.fullscreenElement) {
+      element.requestFullscreen().catch((err) => {
+        console.error(`Error: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const endCall = () => {
+    setIsCallEnded(true);
+    socket.emit("terminateCall", { targetId: partnerUserId });
+    peerConnectionRef.current.destroy();
     window.location.reload();
   };
 
-  const incomingLeaveCall = () => {
-    socket.emit("endCall", { id: otherUser });
+  const endIncomingCall = () => {
+    socket.emit("terminateCall", { targetId: partnerUserId });
+  };
+
+  const sendMessage = (text) => {
+    const newMessage = {
+      message: text,
+      type: "sent",
+      timestamp: Date.now(),
+      sender: name,
+    };
+
+    setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    socket.emit("sendMessage", {
+      targetId: partnerUserId,
+      message: text,
+      senderName: name,
+    });
   };
 
   return (
-    <ContextProvider.Provider
+    <VideoCallContext.Provider
       value={{
         call,
-        callAccepted,
-        myVideo,
-        userVideo,
-        stream,
+        isCallAccepted,
+        myVideoRef,
+        partnerVideoRef,
+        userStream,
         name,
         setName,
-        callEnded,
-        me,
+        isCallEnded,
+        myUserId,
         callUser,
-        leaveCall,
-        answerCall,
-        setOtherUser,
-        incomingLeaveCall,
-        userName,
-        myVideoStatus,
-        setMyVideoStatus,
-        userVideoStatus,
-        setUserVideoStatus,
-        updateVideo,
-        myMicStatus,
-        userMicStatus,
-        updateMic,
+        endCall,
+        receiveCall,
+        sendMessage,
+        receivedMessage,
+        chatMessages,
+        setChatMessages,
+        setReceivedMessage,
+        setPartnerUserId,
+        endIncomingCall,
+        opponentName,
+        isMyVideoActive,
+        setIsMyVideoActive,
+        isPartnerVideoActive,
+        setIsPartnerVideoActive,
+        toggleVideo,
+        isMyMicActive,
+        isPartnerMicActive,
+        toggleMicrophone,
+        isScreenSharing,
+        toggleScreenSharingMode,
+        toggleFullScreen,
       }}
     >
       {children}
-    </ContextProvider.Provider>
+    </VideoCallContext.Provider>
   );
 };
 
-export { ContextProvider, SocketContext };
+export { VideoCallContext, VideoCallProvider };

@@ -1,10 +1,9 @@
 import React, { useState, useContext } from "react";
-import { ContextProvider } from "../../context/Context";
+import { VideoCallContext } from "../../context/Context";
 import { MdFileCopy, MdCall, MdOutlineDone } from "react-icons/md";
 import { Card, Form, Button } from "react-bootstrap";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { css } from "aphrodite";
-import { styles } from "./index";
+import "./FormCard.css";
 
 const FormCard = () => {
   const [idToCall, setIdToCall] = useState("");
@@ -17,31 +16,28 @@ const FormCard = () => {
     }, 1500);
   };
 
-  const { name, setName, me, callUser, callAccepted } = useContext(ContextProvider);
+  const { name, setName, myUserId, callUser, isCallAccepted } =
+    useContext(VideoCallContext);
 
   return (
     <>
-      {!callAccepted && (
-        <div className={css(styles.formSection)}>
-          <Card className={`${css(styles.card)} shadow`}>
+      {!isCallAccepted && (
+        <div className="form-section">
+          <Card className="card">
             <Form noValidate autoComplete="off">
               <Form.Group controlId="name">
-                <Form.Label className={css(styles.formLabel)}>
-                  Your Name
-                </Form.Label>
+                <Form.Label className="form-label">Your Name</Form.Label>
                 <Form.Control
                   type="text"
                   value={name}
-                  className={css(styles.formControl)}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                  }}
+                  className="form-input"
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
                 />
               </Form.Group>
-              <CopyToClipboard text={me}>
+              <CopyToClipboard text={myUserId}>
                 <Button
-                  className={`${css(styles.mainBtn)} mb-3`}
+                  className="form-main-btn mb-3"
                   onClick={handleCopyClick}
                 >
                   {isCopied ? (
@@ -56,19 +52,17 @@ const FormCard = () => {
                 </Button>
               </CopyToClipboard>
               <Form.Group controlId="idToCall">
-                <Form.Label className={css(styles.formLabel)}>
-                  ID to call
-                </Form.Label>
+                <Form.Label className="form-label">ID to call</Form.Label>
                 <Form.Control
                   type="text"
                   value={idToCall}
-                  className={css(styles.formControl)}
+                  className="form-input"
                   onChange={(e) => setIdToCall(e.target.value)}
-                  placeholder="Enter the ID you want to call"
+                  placeholder="Enter the ID to make a call"
                 />
               </Form.Group>
               <Button
-                className={css(styles.mainBtn)}
+                className="form-main-btn"
                 onClick={() => callUser(idToCall)}
               >
                 <MdCall size={22} /> Call

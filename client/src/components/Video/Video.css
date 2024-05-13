@@ -1,0 +1,124 @@
+.video-container {
+  display: flex !important;
+  justify-content: center !important;
+  width: 95% !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+.video-paper {
+  padding: 10px !important;
+  background-color: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 3px 12px 0px #00000033 !important;
+}
+
+.video-name {
+  font-weight: 600 !important;
+}
+
+.video-avatar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+.video-main {
+  border-radius: 10px !important;
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  cursor: pointer !important;
+}
+
+.video-small {
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  width: 390px !important;
+}
+
+.notification-dot {
+  position: absolute !important;
+  top: 2px !important;
+  right: 2px !important;
+  width: 11px !important;
+  height: 11px !important;
+  border-radius: 50% !important;
+  background-color: #e72828 !important;
+}
+
+
+@media (max-width: 768px) {
+  .video-small {
+    width: 280px !important;
+  }
+}
+
+.video-control-btn {
+  position: relative;
+  border-radius: 50% !important;
+  width: 60px !important;
+  height: 60px !important;
+  margin-right: 5px !important;
+  background-color: #9b1fe8 !important;
+  border: 1px solid #9b1fe8 !important;
+  box-shadow: 0px 3px 12px 0px #00000033 !important;
+}
+
+.video-control-btn:hover {
+  border: 1px solid #8d00e4 !important;
+  background-color: #8d00e4 !important;
+}
+
+.video-control-btn:focus {
+  outline: none !important;
+  border: 1px solid #9B1FE8 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+.decline-call-btn {
+  border-radius: 50% !important;
+  width: 60px !important;
+  height: 60px !important;
+  background-color: #e72828 !important;
+  border: 1px solid #e72828 !important;
+  box-shadow: 0px 3px 12px 0px #00000033 !important;
+}
+
+.decline-call-btn:hover {
+  border: 1px solid #d71c1c !important;
+  background-color: #d71c1c !important;
+}
+
+.video-controls {
+  display: flex !important;
+  justify-content: center !important;
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+}
+
+.avatar-background {
+  background-color: #9b1fe8 !important;
+  padding-top: 14px !important;
+  position: absolute !important;
+  font-size: 45px !important;
+}
+
+.avatar-visible {
+  display: block !important;
+}
+
+.avatar-hidden {
+  display: none !important;
+}
+
+.mic-off-icon {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  padding: 10px !important;
+  color: #e72828 !important;
+}

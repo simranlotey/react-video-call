@@ -1,0 +1,38 @@
+.decline-call-btn {
+    border-radius: 50% !important;
+    width: 60px !important;
+    height: 60px !important;
+    background-color: #e72828 !important;
+    border: 1px solid #e72828 !important;
+}
+
+.decline-call-btn:hover {
+    border: 1px solid #d71c1c !important;
+    background-color: #d71c1c !important;
+}
+
+.answer-call-image {
+    cursor: pointer !important;
+}
+
+.answer-call-image img {
+    height: 70px !important;
+}
+
+.call-modal-title {
+    font-weight: 600 !important;
+}
+
+.call-modal-header {
+    border: 0 none !important;
+}
+
+.call-modal-header .btn-close {
+    font-size: 14px !important;
+}
+
+.call-modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    border: 0 none !important;
+}

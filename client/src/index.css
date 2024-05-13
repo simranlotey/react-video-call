@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@200&display=swap");
+
 * {
   margin: 0;
   padding: 0;
@@ -5,14 +7,7 @@
 
 body {
   background-color: #d0bdd4 !important;
-  height: 100vh;
-}
-
-.main-app {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  font-family: "Inter", sans-serif;
 }
 
 ::-webkit-scrollbar {

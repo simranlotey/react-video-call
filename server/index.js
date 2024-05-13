@@ -1,46 +1,60 @@
-const app = require("express")();
-const server = require("http").createServer(app);
+const express = require("express");
+const http = require("http");
 const cors = require("cors");
+const socketIO = require("socket.io");
 
-const io = require("socket.io")(server, {
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors());
-
 const PORT = process.env.PORT || 5000;
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
 io.on("connection", (socket) => {
-  socket.emit("me", socket.id);
+  socket.emit("socketId", socket.id);
 
-  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
-    io.to(userToCall).emit("callUser", {
-      signal: signalData,
-      from,
-      name,
+  socket.on(
+    "initiateCall",
+    ({ targetId, signalData, senderId, senderName }) => {
+      io.to(targetId).emit("incomingCall", {
+        signal: signalData,
+        from: senderId,
+        name: senderName,
+      });
+    }
+  );
+
+  socket.on("changeMediaStatus", ({ mediaType, isActive }) => {
+    socket.broadcast.emit("mediaStatusChanged", {
+      mediaType,
+      isActive,
     });
   });
 
-  socket.on("updateMyMedia", ({ type, currentMediaStatus }) => {
-    socket.broadcast.emit("updateUserMedia", { type, currentMediaStatus });
+  socket.on("sendMessage", ({ targetId, message, senderName }) => {
+    io.to(targetId).emit("receiveMessage", { message, senderName });
   });
 
   socket.on("answerCall", (data) => {
-    socket.broadcast.emit("updateUserMedia", {
-      type: data.type,
-      currentMediaStatus: data.myMediaStatus,
+    socket.broadcast.emit("mediaStatusChanged", {
+      mediaType: data.mediaType,
+      isActive: data.mediaStatus,
     });
-    io.to(data.to).emit("callAccepted", data);
+    io.to(data.to).emit("callAnswered", data);
   });
-  socket.on("endCall", ({ id }) => {
-    io.to(id).emit("endCall");
+
+  socket.on("terminateCall", ({ targetId }) => {
+    io.to(targetId).emit("callTerminated");
   });
 });
 

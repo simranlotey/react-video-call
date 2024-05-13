@@ -1,16 +1,19 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import App from "./App";
-import { SocketContext } from "./context/Context";
-import "./index.css";
+import { VideoCallProvider } from "./context/Context";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'antd/dist/reset.css';
+import "react-toastify/dist/ReactToastify.css";
+import "antd/dist/reset.css";
+import "./index.css";
 
-ReactDOM.render(
+const root = document.getElementById("root");
+const rootElement = createRoot(root);
+
+rootElement.render(
   <React.StrictMode>
-    <SocketContext>
+    <VideoCallProvider>
       <App />
-    </SocketContext>
-  </React.StrictMode>,
-  document.getElementById("root")
+    </VideoCallProvider>
+  </React.StrictMode>
 );

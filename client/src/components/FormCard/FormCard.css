@@ -1,0 +1,43 @@
+.form-section {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding-bottom: 15px !important;
+}
+
+.card {
+    border-radius: 10px !important;
+    padding: 24px !important;
+    width: 280px !important;
+    box-shadow: 0px 5px 15px 0px #00000026 !important;
+}
+
+.form-main-btn {
+    border: 1px solid #9B1FE8 !important;
+    background-color: #9B1FE8 !important;
+    margin-top: 12px !important;
+    width: 100% !important;
+    font-weight: 500 !important;
+}
+
+.form-main-btn:hover {
+    border: 1px solid #8d00e4 !important;
+    background-color: #8d00e4 !important;
+}
+
+.form-input {
+    border: 1px solid #9B1FE8 !important;
+}
+
+.form-input:focus {
+    outline: none !important;
+    border: 1px solid #9B1FE8 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
+.form-label {
+    font-size: 16px !important;
+    margin-bottom: 3px !important;
+    font-weight: 500 !important;
+}
