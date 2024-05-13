@@ -75,7 +75,7 @@ const VideoCallProvider = ({ children }) => {
 
         const timeout = setTimeout(() => {
           setReceivedMessage({});
-        }, 2000);
+        }, 1000);
 
         return () => clearTimeout(timeout);
       });

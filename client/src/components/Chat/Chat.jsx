@@ -66,6 +66,7 @@ const ChatModal = ({
         rtl={false}
         pauseOnFocusLoss
         draggable
+        toastClassName="custom-toast"
       />
       <audio src={notification} ref={notificationSound} />
       <Modal
