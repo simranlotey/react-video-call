@@ -1,14 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { VideoCallContext } from "../../context/Context";
-import {
-  MdMic,
-  MdMicOff,
-  MdVideocam,
-  MdVideocamOff,
-  MdCallEnd,
-  MdOutlineMessage,
-  MdIosShare,
-} from "react-icons/md";
+import { MdMic, MdMicOff, MdVideocam, MdVideocamOff, MdCallEnd, MdOutlineMessage, MdIosShare } from "react-icons/md";
 import { Button, Col, Row } from "react-bootstrap";
 import { Avatar } from "antd";
 import { FaUserLarge, FaVolumeXmark } from "react-icons/fa6";

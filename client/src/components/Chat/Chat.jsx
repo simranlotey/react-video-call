@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import notification from "../../assets/notification.mp3";
-import { Modal, Button, FormControl } from "react-bootstrap";
+import { Modal, FormControl } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
 import { AiOutlineMessage } from "react-icons/ai";
-import { IoSend } from "react-icons/io5";
+import { BsSendFill, BsEmojiSmile } from "react-icons/bs";
+import Picker from "emoji-picker-react";
 import "./Chat.css";
 
 const ChatModal = ({
@@ -17,6 +18,7 @@ const ChatModal = ({
 }) => {
   const messagesEndRef = useRef(null);
   const notificationSound = useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -47,14 +49,22 @@ const ChatModal = ({
   const handleSend = () => {
     if (sendMessage.trim()) {
       onSearch(sendMessage);
+      setSendMessage("");
+      setShowEmojiPicker(false);
     }
   };
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       handleSend();
     }
   };
+
+  const handleEmojiSelect = (emojiObject) => {
+    setSendMessage((prevMessage) => prevMessage + emojiObject.emoji);
+  };
+
   return (
     <>
       <ToastContainer
@@ -72,13 +82,19 @@ const ChatModal = ({
       <Modal
         className="chat-modal-main"
         show={isVisible}
-        onHide={() => toggleModal(false)}
+        onHide={() => {
+          toggleModal(false);
+          setShowEmojiPicker(false);
+        }}
         centered
       >
         <Modal.Header closeButton className="chat-modal-header">
           <Modal.Title className="chat-modal-title">Chat</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="chat-modal-body">
+        <Modal.Body
+          className="chat-modal-body"
+          onClick={() => setShowEmojiPicker(false)}
+        >
           {chatMessages.length ? (
             <div className="message">
               {chatMessages.map((message, index) => (
@@ -109,11 +125,29 @@ const ChatModal = ({
               className="chat-input"
               value={sendMessage}
               onChange={(e) => setSendMessage(e.target.value)}
+              onClick={() => setShowEmojiPicker(false)}
               onKeyPress={handleKeyPress}
             />
-            <Button className="send-message" onClick={handleSend}>
-              <IoSend size={22} />
-            </Button>
+            <BsEmojiSmile
+              className="emoji-toggle"
+              size={30}
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            />
+            {showEmojiPicker && (
+              <Picker
+                searchDisabled={true}
+                height={310}
+                width={310}
+                emojiStyle="google"
+                onEmojiClick={handleEmojiSelect}
+                className="emoji"
+              />
+            )}
+            <BsSendFill
+              className="send-message"
+              size={30}
+              onClick={handleSend}
+            />
           </div>
         </Modal.Footer>
       </Modal>
